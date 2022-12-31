@@ -38,7 +38,7 @@ async def activate_queue():
             conn.commit()
             conn.close()
             try:
-                await bot.send_message(user_id, response, reply_to_message_id=message_id)
+                await bot.send_message(user_id, response, reply_to_message_id=message_id, parse_mode=None)
             except BotBlocked:
                 pass
             try:
