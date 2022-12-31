@@ -22,7 +22,7 @@ async def timer_hour():
             if hours > 0:
                 await send_email(f"{hours}ч")
             else:
-                await send_email(f"{hours}ч")
+                await send_email(f"{minutes}мин")
 
 
 async def send_email(times):
