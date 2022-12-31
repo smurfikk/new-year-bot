@@ -18,8 +18,8 @@ async def timer_hour():
     if date.year == 2022:
         hours = 24 - date.hour
         minutes = 60 - date.minute
-        if minutes == 60 or hours == 0:
-            if hours > 0:
+        if minutes == 60 or hours == 1:
+            if hours > 1:
                 await send_email(f"{hours}ч")
             else:
                 await send_email(f"{minutes}мин")
