@@ -12,7 +12,7 @@ counter = 0
 
 
 @dp.message_handler(chat_type=[ChatType.GROUP, ChatType.SUPERGROUP], regexp=r"сколько.+(нг|нового года)", state='*')
-async def handler_msg(message: Message, state: FSMContext):
+async def handler_new_year(message: Message, state: FSMContext):
     await state.finish()
     date = open_ai_func.get_date()
     if date.year == 2022:
@@ -29,12 +29,30 @@ async def handler_msg(message: Message, state: FSMContext):
     await message.answer(text)
 
 
+@dp.message_handler(chat_type=[ChatType.GROUP, ChatType.SUPERGROUP], regexp=r"когда.+(нг|новый год)", state='*')
+async def handler_new_year2(message: Message, state: FSMContext):
+    await state.finish()
+    date = open_ai_func.get_date()
+    if date.year == 2022:
+        hours = 24 - date.hour
+        minutes = 60 - date.minute
+        if hours > 0:
+            times = f"{hours}ч"
+        else:
+            times = f"{minutes}мин"
+        text = f"<b>До нового года {times}</b>\n\n" \
+               f"<i>{texts.congratulations2[random.randint(0, 13)]}</i>"
+    else:
+        text = "Дахуя"
+    await message.answer(text)
+
+
 @rate_limit(0)
 @dp.message_handler(chat_type=[ChatType.GROUP, ChatType.SUPERGROUP], state='*')
 async def handler_msg(message: Message, state: FSMContext):
     global counter
     counter += 1
-    if counter >= 15 or random.randint(0, 10) == 1:
+    if counter >= 15 or random.randint(0, 7) == 1:
         text = message.text
         if len(text) < 1000:
             await enter_queue(message.chat.id, text, message.message_id)
