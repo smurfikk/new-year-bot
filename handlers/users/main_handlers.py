@@ -24,7 +24,7 @@ async def handler_new_year(message: types.Message, state: FSMContext):
     if date.year == 2022:
         hours = 24 - date.hour
         minutes = 60 - date.minute
-        if hours > 0:
+        if hours > 1:
             times = f"{hours}ч"
         else:
             times = f"{minutes}мин"
