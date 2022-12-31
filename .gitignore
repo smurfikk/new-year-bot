@@ -1,0 +1,10 @@
+.idea
+*.sqlite3
+*.sqlite
+*.db
+.DS_store
+venv/
+__pycache__/
+*.log
+test.py
+.env
