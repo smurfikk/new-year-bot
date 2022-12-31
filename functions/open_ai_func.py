@@ -5,6 +5,7 @@ import openai
 import asyncio
 
 import config
+from functions.func import *
 from loader import bot
 from aiogram.utils.exceptions import BotBlocked
 from functions.caching import caching
@@ -31,6 +32,11 @@ async def activate_queue():
         queue.remove([user_id, prompt, message_id, message_id_delete])
         try:
             response = get_response(prompt)
+            conn, cursor = connect()
+            cursor.execute("INSERT INTO messages (date_send, from_user, input_text, output_text) VALUES (?, ?, ?, ?)",
+                           [get_date(), user_id, prompt, response])
+            conn.commit()
+            conn.close()
             try:
                 await bot.send_message(user_id, response, reply_to_message_id=message_id)
             except BotBlocked:
