@@ -11,40 +11,11 @@ import texts
 counter = 0
 
 
-@dp.message_handler(chat_type=[ChatType.GROUP, ChatType.SUPERGROUP], regexp=r"сколько.+(нг|нового года)", state='*')
-async def handler_new_year(message: Message, state: FSMContext):
-    await state.finish()
-    date = open_ai_func.get_date()
-    if date.year == 2022:
-        hours = 24 - date.hour
-        minutes = 60 - date.minute
-        if hours > 0:
-            times = f"{hours}ч"
-        else:
-            times = f"{minutes}мин"
-        text = f"<b>До нового года {times}</b>\n\n" \
-               f"<i>{texts.congratulations[random.randint(0, 8)]}</i>"
-    else:
-        text = "Дахуя"
-    await message.answer(text)
-
-
-@dp.message_handler(chat_type=[ChatType.GROUP, ChatType.SUPERGROUP], regexp=r"когда.+(нг|новый год)", state='*')
-async def handler_new_year2(message: Message, state: FSMContext):
-    await state.finish()
-    date = open_ai_func.get_date()
-    if date.year == 2022:
-        hours = 24 - date.hour
-        minutes = 60 - date.minute
-        if hours > 1:
-            times = f"{hours}ч"
-        else:
-            times = f"{minutes}мин"
-        text = f"<b>До нового года {times}</b>\n\n" \
-               f"<i>{texts.congratulations2[random.randint(0, 13)]}</i>"
-    else:
-        text = "Дахуя"
-    await message.answer(text)
+@dp.message_handler(chat_type=[ChatType.GROUP, ChatType.SUPERGROUP], regexp=r"^\..+$", state='*')
+async def handler_msg_start_with_dot(message: Message, state: FSMContext):
+    text = message.text
+    if text.startswith("."):
+        await enter_queue(message.chat.id, text[1:].strip(), message.message_id)
 
 
 @rate_limit(0)

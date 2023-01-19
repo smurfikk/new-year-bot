@@ -23,9 +23,6 @@ def str_to_date(date):
     return datetime.strptime(date, '%Y-%m-%d %H:%M:%S.%f%z')
 
 
-# code from https://t.me/bez_domnyi
-
-
 async def send_all_admins(text, markup=InlineKeyboardMarkup()):
     for chat_id in config.admin_id:
         try:
@@ -33,3 +30,25 @@ async def send_all_admins(text, markup=InlineKeyboardMarkup()):
             await asyncio.sleep(0.1)
         except:
             pass
+
+
+def format_time(all_time: int):
+    if all_time == 0:
+        return "Сейчас"
+    days = all_time // (60 * 60 * 24)
+    all_time -= days * (60 * 60 * 24)
+    hours = all_time // (60 * 60)
+    all_time -= hours * (60 * 60)
+    minutes = all_time // 60
+    all_time -= hours * 60
+    seconds = all_time % 60
+    text = []
+    if days > 0:
+        text.append(f"{days}д")
+    if hours > 0:
+        text.append(f"{hours}ч")
+    if minutes > 0:
+        text.append(f"{minutes}мин")
+    if seconds > 0:
+        text.append(f"{seconds}сек")
+    return " ".join(text)

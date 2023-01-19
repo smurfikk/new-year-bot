@@ -3,6 +3,7 @@ import random
 
 from aiogram import types
 from aiogram.dispatcher import FSMContext
+from aiogram.types import ChatType
 
 from keyboards import main_menu
 from loader import dp, bot
@@ -17,39 +18,18 @@ async def send_welcome(message: types.Message, state: FSMContext):
     await message.answer(texts.start, reply_markup=main_menu.main_menu(message.from_user.id))
 
 
-@dp.message_handler(chat_type="private", regexp=r"сколько.+(нг|нового года)", state='*')
+@dp.message_handler(chat_type=[ChatType.GROUP, ChatType.SUPERGROUP, ChatType.PRIVATE],
+                    regexp=r"когда.+(нг|новый год)", state="*")
+@dp.message_handler(chat_type=[ChatType.GROUP, ChatType.SUPERGROUP, ChatType.PRIVATE],
+                    regexp=r"сколько (до|осталось до).+(нг|нового года)", state="*")
 async def handler_new_year(message: types.Message, state: FSMContext):
     await state.finish()
     date = open_ai_func.get_date()
-    if date.year == 2022:
-        hours = 24 - date.hour
-        minutes = 60 - date.minute
-        if hours > 1:
-            times = f"{hours}ч"
-        else:
-            times = f"{minutes}мин"
-        text = f"<b>До нового года {times}</b>\n\n" \
-               f"<i>{texts.congratulations[random.randint(0, 8)]}</i>"
-    else:
-        text = "Дахуя"
-    await message.answer(text)
-
-
-@dp.message_handler(chat_type="private", regexp=r"когда.+(нг|новый год)", state='*')
-async def handler_new_year2(message: types.Message, state: FSMContext):
-    await state.finish()
-    date = open_ai_func.get_date()
-    if date.year == 2022:
-        hours = 24 - date.hour
-        minutes = 60 - date.minute
-        if hours > 0:
-            times = f"{hours}ч"
-        else:
-            times = f"{minutes}мин"
-        text = f"<b>До нового года {times}</b>\n\n" \
-               f"<i>{texts.congratulations2[random.randint(0, 13)]}</i>"
-    else:
-        text = "Дахуя"
+    new_year = date.replace(year=date.year + 1, day=1, month=1, hour=0, minute=0, second=0)
+    times = open_ai_func.format_time(int((new_year - date).total_seconds()))
+    text = f"<b>До нового года {times}</b>"
+    if date.month == 12 and date.day == 31:
+        text += f"\n\n<i>{texts.congratulations_all[random.randint(0, 21)]}</i>"
     await message.answer(text)
 
 
