@@ -31,14 +31,26 @@ async def activate_queue():
         user_id, prompt, message_id, message_id_delete = queue[0]
         queue.remove([user_id, prompt, message_id, message_id_delete])
         try:
-            response = get_response(prompt)
+            image = False
+            if prompt.startswith((".img", "img")):
+                image = True
+                prompt = prompt[4:].strip()
+            elif prompt.startswith("."):
+                prompt = prompt[1:].strip()
+            if len(prompt) == 0:
+                continue
+            response = get_response(prompt, image)
             conn, cursor = connect()
             cursor.execute("INSERT INTO messages (date_send, from_user, input_text, output_text) VALUES (?, ?, ?, ?)",
                            [get_date(), user_id, prompt, response])
             conn.commit()
             conn.close()
             try:
-                await bot.send_message(user_id, response, reply_to_message_id=message_id, parse_mode=None)
+                if image:
+                    await bot.send_photo(user_id, response, caption=prompt, reply_to_message_id=message_id,
+                                         parse_mode=None)
+                else:
+                    await bot.send_message(user_id, response, reply_to_message_id=message_id, parse_mode=None)
             except BotBlocked:
                 pass
             try:
@@ -51,7 +63,10 @@ async def activate_queue():
 
 
 @caching(15 * 60)
-def get_response(prompt):
+def get_response(prompt: str, image: bool):
+    if image:
+        completion_image = openai.Image.create(prompt=prompt)
+        return completion_image.data[0].url
     completion = openai.Completion.create(
         engine=model_engine,
         prompt=prompt,

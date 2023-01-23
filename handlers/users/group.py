@@ -15,7 +15,7 @@ counter = {}
 async def handler_msg_start_with_dot(message: Message, state: FSMContext):
     text = message.text
     if text.startswith("."):
-        await enter_queue(message.chat.id, text[1:].strip(), message.message_id)
+        await enter_queue(message.chat.id, text, message.message_id)
 
 
 @rate_limit(0)
