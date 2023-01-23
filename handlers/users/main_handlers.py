@@ -18,6 +18,15 @@ async def send_welcome(message: types.Message, state: FSMContext):
     await message.answer(texts.start, reply_markup=main_menu.main_menu(message.from_user.id))
 
 
+@dp.message_handler(commands=['help'], state='*')
+async def handler_help(message: types.Message, state: FSMContext):
+    await state.finish()
+    chat_type = message.chat.type
+    if chat_type != "private":
+        chat_type = "group"
+    await message.answer(texts.help_text[chat_type], reply_markup=main_menu.main_menu(message.from_user.id))
+
+
 @dp.message_handler(chat_type=[ChatType.GROUP, ChatType.SUPERGROUP, ChatType.PRIVATE],
                     regexp=r"когда.+(нг|новый год)", state="*")
 @dp.message_handler(chat_type=[ChatType.GROUP, ChatType.SUPERGROUP, ChatType.PRIVATE],
